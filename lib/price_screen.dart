@@ -91,26 +91,20 @@ class _PriceScreenState extends State<PriceScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  '1 BTC = ${usd.toStringAsFixed(2)} $selectedItemValue',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
+          DataCard(
+            usd: usd,
+            selectedItemValue: selectedItemValue,
+            crypto: cryptoList[0],
+          ),
+          DataCard(
+            usd: usd,
+            selectedItemValue: selectedItemValue,
+            crypto: cryptoList[1],
+          ),
+          DataCard(
+            usd: usd,
+            selectedItemValue: selectedItemValue,
+            crypto: cryptoList[2],
           ),
           Container(
             height: 150.0,
@@ -120,6 +114,49 @@ class _PriceScreenState extends State<PriceScreen> {
             child: dropdownSelector(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class DataCard extends StatefulWidget {
+  const DataCard({
+    Key? key,
+    required this.usd,
+    required this.selectedItemValue,
+    this.crypto = "BTC",
+  }) : super(key: key);
+
+  final double usd;
+  final String selectedItemValue;
+  final String crypto;
+
+  @override
+  State<DataCard> createState() => _DataCardState();
+}
+
+class _DataCardState extends State<DataCard> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+      child: Card(
+        color: Colors.lightBlueAccent,
+        elevation: 5.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+          child: Text(
+            '1 ${widget.crypto} = ${widget.usd.toStringAsFixed(2)} ${widget.selectedItemValue}',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 20.0,
+              color: Colors.white,
+            ),
+          ),
+        ),
       ),
     );
   }
