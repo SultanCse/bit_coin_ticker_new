@@ -29,24 +29,30 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 
   Widget dropdownSelector() {
-    if (1 == 1) {
+    if (1 == 2) {
       //Platform.isIOS
       //chrome emulator platform support kore na.error mare
       // print(Platform.isIOS);
       return CupertinoPicker(
         children: getCupertinoItems(itemList: currenciesList)!,
         itemExtent: 50,
-        onSelectedItemChanged: (value) {
-          print(value);
+        onSelectedItemChanged: (value) async {
+          setState(() {
+            selectedItemValue = currenciesList[value];
+            getData(selectedItemValue);
+          });
         },
       );
     } else {
       return DropdownButton<String>(
         items: getDropdownItems(itemList: currenciesList),
-        onChanged: (value) {
-          setState(() {
-            selectedItemValue = value!;
-          });
+        onChanged: (value) async {
+          setState(
+            () {
+              selectedItemValue = value!;
+              getData(selectedItemValue);
+            },
+          );
         },
         value: selectedItemValue,
       );
@@ -57,11 +63,12 @@ class _PriceScreenState extends State<PriceScreen> {
   //   Platform.isIOS?
   // }
 
-  String selectedItemValue = "USD";
+  String selectedItemValue = "AUD";
   var data;
   double usd = 0;
-  void getData() async {
-    data = await DataGetModel.fetchData(DataGetModel.apiBTCtoUSD);
+  void getData(String currency) async {
+    data = await DataGetModel.fetchData(currency: currency);
+    print(data);
     setState(() {
       usd = data["rate"];
     });
@@ -70,7 +77,7 @@ class _PriceScreenState extends State<PriceScreen> {
   @override
   void initState() {
     super.initState();
-    getData();
+    getData("AUD");
   }
 
   @override
@@ -95,7 +102,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = ${usd.toStringAsFixed(2)} USD',
+                  '1 BTC = ${usd.toStringAsFixed(2)} $selectedItemValue',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 20.0,
