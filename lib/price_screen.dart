@@ -30,7 +30,7 @@ class _PriceScreenState extends State<PriceScreen> {
 
   Widget dropdownSelector() {
     if (1 == 2) {
-      //Platform.isIOS
+      //if(Platform.isIOS)
       //chrome emulator platform support kore na.error mare
       // print(Platform.isIOS);
       return CupertinoPicker(
@@ -38,8 +38,8 @@ class _PriceScreenState extends State<PriceScreen> {
         itemExtent: 50,
         onSelectedItemChanged: (value) async {
           setState(() {
-            selectedItemValue = currenciesList[value];
-            getData(selectedItemValue);
+            selectedCurrency = currenciesList[value];
+            getData2(selectedCurrency);
           });
         },
       );
@@ -49,35 +49,32 @@ class _PriceScreenState extends State<PriceScreen> {
         onChanged: (value) async {
           setState(
             () {
-              selectedItemValue = value!;
-              getData(selectedItemValue);
+              selectedCurrency = value!;
+              getData2(selectedCurrency);
             },
           );
         },
-        value: selectedItemValue,
+        value: selectedCurrency,
       );
     }
   }
 
-  // Widget dropDownOrCupertino(){
-  //   Platform.isIOS?
-  // }
-
-  String selectedItemValue = "AUD";
+  String selectedCurrency = "AUD";
   var data;
-  double usd = 0;
-  void getData(String currency) async {
-    data = await DataGetModel.fetchData(currency: currency);
-    print(data);
+  Map<String, String> cryptoRespectValue = {};
+  void getData2(String currencyName) async {
+    DataGetModel dgm = DataGetModel();
+    data = await dgm.fetchData2(currencyName: currencyName);
     setState(() {
-      usd = data["rate"];
+      cryptoRespectValue = DataGetModel.cryptoRespectValue;
     });
   }
 
   @override
   void initState() {
     super.initState();
-    getData("AUD");
+    // getData("BTC", "AUD");
+    getData2(selectedCurrency);
   }
 
   @override
@@ -91,20 +88,25 @@ class _PriceScreenState extends State<PriceScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DataCard(
-            usd: usd,
-            selectedItemValue: selectedItemValue,
-            crypto: cryptoList[0],
-          ),
-          DataCard(
-            usd: usd,
-            selectedItemValue: selectedItemValue,
-            crypto: cryptoList[1],
-          ),
-          DataCard(
-            usd: usd,
-            selectedItemValue: selectedItemValue,
-            crypto: cryptoList[2],
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              DataCard(
+                selectedCurrencyValue: cryptoRespectValue[cryptoList[0]] ?? "?",
+                selectedCurrency: selectedCurrency,
+                crypto: cryptoList[0],
+              ),
+              DataCard(
+                selectedCurrencyValue: cryptoRespectValue[cryptoList[1]] ?? "?",
+                selectedCurrency: selectedCurrency,
+                crypto: cryptoList[1],
+              ),
+              DataCard(
+                selectedCurrencyValue: cryptoRespectValue[cryptoList[2]] ?? "?",
+                selectedCurrency: selectedCurrency,
+                crypto: cryptoList[2],
+              ),
+            ],
           ),
           Container(
             height: 150.0,
@@ -119,23 +121,17 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 }
 
-class DataCard extends StatefulWidget {
+class DataCard extends StatelessWidget {
   const DataCard({
     Key? key,
-    required this.usd,
-    required this.selectedItemValue,
+    required this.selectedCurrencyValue,
+    required this.selectedCurrency,
     this.crypto = "BTC",
   }) : super(key: key);
 
-  final double usd;
-  final String selectedItemValue;
+  final String selectedCurrencyValue;
+  final String selectedCurrency;
   final String crypto;
-
-  @override
-  State<DataCard> createState() => _DataCardState();
-}
-
-class _DataCardState extends State<DataCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -147,9 +143,10 @@ class _DataCardState extends State<DataCard> {
           borderRadius: BorderRadius.circular(10.0),
         ),
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+          padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
           child: Text(
-            '1 ${widget.crypto} = ${widget.usd.toStringAsFixed(2)} ${widget.selectedItemValue}',
+            '1 $crypto = $selectedCurrencyValue $selectedCurrency',
+            // '1 $crypto = ${usd.toStringAsFixed(2)} $selectedItemValue'
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 20.0,
